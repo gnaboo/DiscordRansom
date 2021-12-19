@@ -3,6 +3,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# The file containing the Discord Token
+token.txt
+
+# Testing python files
+nuker.py
+backup.py
+
+# Storage for the bot
+victims.json
+
 # C extensions
 *.so
 
