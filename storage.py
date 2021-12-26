@@ -1,4 +1,5 @@
 from saver import *
+import base64
 
 class Victim:
     def __init__(self,
@@ -28,7 +29,7 @@ class Victim:
         self.category[category.id] = {"name": category.name, "position": category.position}
 
     def add_role(self, roles):
-        self.roles[roles.id] = {"name": roles.name, "permissions": roles.permissions.value}
+        self.roles[roles.id] = {"name": roles.name}
 
     def add_user(self, users):
         self.users[users.id] = {"name": users.name, "discriminator": users.discriminator, "avatar": users.avatar}
@@ -43,26 +44,47 @@ class Victim:
         print(self.roles)
         print(self.users)
 
-    def turn_data_to_unicode(self):
+    def encode_data(self):
         for channel in self.text_channels:
-            self.text_channels[channel]["topic"] = str(self.text_channels[channel]["topic"])
-            self.text_channels[channel]["name"] = str(self.text_channels[channel]["name"])
-            self.text_channels[channel]["position"] = str(self.text_channels[channel]["position"])
-            self.text_channels[channel]["type"] = str(self.text_channels[channel]["type"])
+            self.text_channels[channel]["topic"] = base64.b64encode(str(self.text_channels[channel]["topic"]).encode()).decode()
+            self.text_channels[channel]["name"] = base64.b64encode(str(self.text_channels[channel]["name"]).encode()).decode()
+            #self.text_channels[channel]["position"] = base64.b64encode(str(self.text_channels[channel]["position"]).encode()).decode()
+            #self.text_channels[channel]["type"] = base64.b64encode(str(self.text_channels[channel]["type"]).encode()).decode()
         for channel in self.voice_channels:
-            self.voice_channels[channel]["name"] = str(self.voice_channels[channel]["name"])
-            self.voice_channels[channel]["position"] = str(self.voice_channels[channel]["position"])
-            self.voice_channels[channel]["type"] = str(self.voice_channels[channel]["type"])
+            self.voice_channels[channel]["name"] = base64.b64encode(str(self.voice_channels[channel]["name"]).encode()).decode()
+            #self.voice_channels[channel]["position"] = base64.b64encode(str(self.voice_channels[channel]["position"]).encode()).decode()
+            #self.voice_channels[channel]["type"] = base64.b64encode(str(self.voice_channels[channel]["type"]).encode()).decode()
         for category in self.category:
-            self.category[category]["name"] = str(self.category[category]["name"])
-            self.category[category]["position"] = str(self.category[category]["position"])
+            self.category[category]["name"] = base64.b64encode(str(self.category[category]["name"]).encode()).decode()
+            #self.category[category]["position"] = base64.b64encode(str(self.category[category]["position"]).encode()).decode()
         for roles in self.roles:
-            self.roles[roles]["name"] = str(self.roles[roles]["name"])
-            self.roles[roles]["permissions"] = str(self.roles[roles]["permissions"])
+            self.roles[roles]["name"] = base64.b64encode(str(self.roles[roles]["name"]).encode()).decode()
         for users in self.users:
-            self.users[users]["name"] = str(self.users[users]["name"])
-            self.users[users]["discriminator"] = str(self.users[users]["discriminator"])
-            self.users[users]["avatar"] = str(self.users[users]["avatar"])
+            self.users[users]["name"] = base64.b64encode(str(self.users[users]["name"]).encode()).decode()
+            #self.users[users]["discriminator"] = base64.b64encode(str(self.users[users]["discriminator"]).encode()).decode()
+            #self.users[users]["avatar"] = base64.b64encode(str(self.users[users]["avatar"]).encode()).decode()
+
+    def decode_data_from_base64(self):
+        for channel in self.text_channels:
+            self.text_channels[channel]["topic"] = base64.b64decode(str(self.text_channels[channel]["topic"]).encode()).decode()
+            self.text_channels[channel]["name"] = base64.b64decode(str(self.text_channels[channel]["name"]).encode()).decode()
+        for channel in self.voice_channels:
+            self.voice_channels[channel]["name"] = base64.b64decode(str(self.voice_channels[channel]["name"]).encode()).decode()
+        for category in self.category:
+            self.category[category]["name"] = base64.b64decode(str(self.category[category]["name"]).encode()).decode()
+        for roles in self.roles:
+            self.roles[roles]["name"] = base64.b64decode(str(self.roles[roles]["name"]).encode()).decode()
+        for users in self.users:
+            self.users[users]["name"] = base64.b64decode(str(self.users[users]["name"]).encode()).decode()
+
+    def load_data(self):
+        config = load_json("victims.json")
+        self.server = config[str(self.server.id)]
+        self.text_channels = self.server["text_channels"]
+        self.voice_channels = self.server["voice_channels"]
+        self.category = self.server["category"]
+        self.roles = self.server["roles"]
+        self.users = self.server["users"]
 
     def store_data(self):
         config = load_json("victims.json")
@@ -74,5 +96,5 @@ class Victim:
                                self.category,
                                self.roles,
                                self.users)
-        print(config)
+
         save_json("victims.json", config)
